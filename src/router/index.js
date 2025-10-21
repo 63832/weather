@@ -23,6 +23,11 @@ const router = createRouter({
             component: () => import('../views/LocationsView.vue'),
         },
         {
+            path: '/forecast/:name',
+            component: HomeView,
+            props: true,
+        },
+        {
             path: '/forecast/:name/:lat/:long',
             name: 'forecast',
             component: HomeView,
