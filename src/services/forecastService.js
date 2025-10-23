@@ -52,3 +52,42 @@ function transformData(raw) {
     }
     return weatherData
 }
+
+export function getCurrentWeather(location) {
+    return new Promise((resolve, reject) => {
+        fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${location.lat}&longitude=${location.long}&hourly=temperature_2m&current=temperature_2m,relative_humidity_2m,precipitation,apparent_temperature,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=ms`,
+
+        )
+            .then(response => {
+                if (response.ok) {
+                    return response.json()
+                } else {
+                    reject(response.json())
+                }
+            })
+            .then(data => {
+                resolve(transformCurrent(data))
+            })
+    })
+}
+
+function transformCurrent(weather) {
+    let curWeather = {}
+    curWeather.time = weather.current.time
+    curWeather.temp = {
+        temp: weather.current.temperature_2m, temp_unit: weather.current_units.temperature_2m,
+        humidity: weather.current.relative_humidity_2m, humidity_unit: weather.current_units.relative_humidity_2m,
+        apparent: weather.current.apparent_temperature
+    }
+    curWeather.precipitation = { precipitation: weather.current.precipitation, unit: weather.current_units.precipitation }
+    curWeather.code = weather.current.weather_code
+    curWeather.wind = {
+        windspeed: weather.current.wind_speed_10m, unit: weather.current_units.wind_speed_10m,
+        direction: weather.current.wind_direction_10m, direction_unit: weather.current_units.wind_direction_10m,
+        windgusts: weather.current.wind_gusts_10m
+    }
+    curWeather.pressure = { pressure: weather.current.pressure_msl, unit: weather.current_units.pressure_msl }
+    curWeather.cloud = { coverage: weather.current.cloud_cover, unit: weather.current_units.cloud_cover }
+    return curWeather
+}
