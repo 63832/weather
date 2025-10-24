@@ -53,10 +53,10 @@ li {
 }
 
 ul:nth-child(even) {
-  background-color: aqua;
+  background-color: rgb(74, 187, 187);
 }
 
 ul:nth-child(odd) {
-  background-color: antiquewhite;
+  background-color: rgb(243, 232, 217);
 }
 </style>

@@ -1,13 +1,23 @@
 <script setup>
-import { ref, watchEffect } from 'vue'
+import { onMounted, ref, watch, watchEffect } from 'vue'
 import { getCurrentWeather, getForecast } from '@/services/forecastService'
 import ForecastResult from '@/components/ForecastResult.vue'
 import CurrentWeather from '@/components/currentWeather.vue'
+import { getPosition } from '@/services/positioningService'
 
 const location = ref({})
 const info = ref({})
 const currentWeather = ref({})
+const currentLocation = ref({ lat: 0.0, long: 0.0, name: 'Current location' })
 const props = defineProps(['name', 'lat', 'long'])
+
+onMounted(() => {
+  getPosition()
+    .then((pos) => {
+      currentLocation.value = { name: 'Current location', ...pos.position }
+    })
+    .catch(() => {})
+})
 
 function fetchForeCast(loc) {
   getForecast(loc)
@@ -44,7 +54,7 @@ watchEffect(() => {
     }
   } else {
     // Tilldela default-position
-    location.value = { lat: 60.0, long: 20.0, name: 'Nuvarande position' }
+    location.value = currentLocation.value
   }
 
   if (!tmpLocation && typeof props.lat !== 'undefined' && typeof props.long !== 'undefined') {
@@ -54,6 +64,12 @@ watchEffect(() => {
   }
   if (typeof location.value.name !== 'undefined') {
     fetchForeCast(location.value)
+  }
+})
+
+watch(currentLocation, () => {
+  if (location.value.name == currentLocation.value.name) {
+    fetchForeCast(currentLocation.value)
   }
 })
 </script>
