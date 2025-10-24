@@ -26,70 +26,60 @@ function toggleActive() {
   display: block;
 }
 
-#burger.active .burger-button {
-  transform: rotate(-180deg);
-}
-
-#burger.active .bar--1 {
-  transform: rotate(45deg);
-  top: 50%;
-}
-
-#burger.active .bar--2 {
-  opacity: 0;
-}
-
-#burger.active .bar--3 {
-  transform: rotate(-45deg);
-  top: 50%;
-}
-
 .burger-button {
   position: relative;
   height: 30px;
   width: 40px;
-  display: block;
-  z-index: 99;
-  border: 0;
-  border-radius: 0;
-  background-color: transparent;
-  pointer-events: all;
-  transition: transform 1s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-
-.burger-bar {
-  background-color: #666666;
-  position: absolute;
-  top: 50%;
-  right: 6px;
-  left: 6px;
-  height: 3px;
-  width: auto;
-  border-radius: 4px;
-  margin-top: -1px;
-  transition:
-    transform 1s cubic-bezier(cubic-bezier(0.165, 0.84, 0.44, 1)),
-    opacity 0.3s cubic-bezier(0.165, 0.84, 0.44, 1),
-    background-color 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-
-.bar--1 {
-  -webkit-transform: translateY(-6px);
-  transform: translateY(-6px);
-  top: 40%;
-}
-
-.bar--2 {
-  transform-origin: 100% 50%;
-  transform: scaleX(1);
-}
-
-.bar--3 {
-  transform: translateY(6px);
-  top: 60%;
-}
-
-button {
+  border: none;
+  background: transparent;
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.5s ease-in-out;
+}
+
+/* Streck */
+.burger-bar {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  background-color: #222;
+  border-radius: 2px;
+  transition:
+    transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.4s ease,
+    background-color 0.3s ease;
+}
+
+/* Startläge */
+.bar--1 {
+  transform: translateY(-7px);
+}
+.bar--2 {
+  transform: translateY(0);
+}
+.bar--3 {
+  transform: translateY(7px);
+}
+
+/* === ACTIVE (X) === */
+#burger.active .bar--1 {
+  transform: translateY(0) rotate(45deg);
+}
+
+#burger.active .bar--2 {
+  transform: scaleX(0.2);
+  opacity: 0;
+}
+
+#burger.active .bar--3 {
+  transform: translateY(0) rotate(-45deg);
+}
+
+/* Liten modern hover-effekt (fungerar i båda lägen) */
+#burger .burger-button:hover .burger-bar {
+  background-color: #000;
 }
 </style>
