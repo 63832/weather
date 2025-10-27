@@ -3,7 +3,8 @@ const props = defineProps(['active'])
 const emits = defineEmits(['toggle-menu'])
 
 function toggleActive() {
-  emits('toggle-menu', props.active)
+  // emit the *next* state (toggle)
+  emits('toggle-menu', !props.active)
 }
 </script>
 
@@ -14,7 +15,7 @@ function toggleActive() {
       <span class="burger-bar bar--2"></span>
       <span class="burger-bar bar--3"></span>
     </button>
-    <nav class="navbar" v-show="props.active">
+    <nav class="navbar" v-if="props.active" @click.stop>
       <RouterLink to="/">Home</RouterLink>
       <RouterLink to="/locations">Locations</RouterLink>
     </nav>
@@ -24,10 +25,11 @@ function toggleActive() {
 <style scoped>
 #burger {
   display: block;
+  position: relative;
 }
 
 .burger-button {
-  position: relative;
+  position: fixed;
   height: 30px;
   width: 40px;
   border: none;
@@ -37,6 +39,9 @@ function toggleActive() {
   justify-content: center;
   align-items: center;
   transition: transform 0.5s ease-in-out;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1001;
 }
 
 /* Streck */
@@ -81,5 +86,31 @@ function toggleActive() {
 /* Liten modern hover-effekt (fungerar i båda lägen) */
 #burger .burger-button:hover .burger-bar {
   background-color: #000;
+}
+
+/* Overlay navbar that doesn't affect page layout */
+.navbar {
+  position: fixed;
+  top: 3.6rem; /* below the burger button */
+  left: 1rem;
+  background: #fff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  z-index: 1000;
+}
+
+.navbar a {
+  padding: 0.5rem 0.75rem;
+  color: #222;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.navbar a:hover {
+  background: rgba(0, 0, 0, 0.04);
 }
 </style>

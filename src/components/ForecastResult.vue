@@ -40,23 +40,85 @@ function getText(code) {
 <style scoped>
 ul {
   padding: 0;
+  margin: 0;
   display: grid;
-  grid-template-columns: 12% 12% 22% 15% auto;
+  grid-template-columns: 12% 14% 22% 18% auto;
+  align-items: center;
+  font-size: 0.95rem;
+  color: #222;
+  transition: background 0.2s ease;
 }
+
+ul:first-of-type {
+  background: #264653;
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 8px 8px 0 0;
+}
+
+ul:not(:first-of-type):nth-child(even) {
+  background-color: #f7f4ef;
+}
+
+ul:not(:first-of-type):nth-child(odd) {
+  background-color: #d8f0f0;
+}
+
 li {
-  padding: 0 0.5em;
+  padding: 0.6rem 0.4rem;
   list-style-type: none;
-  display: inline-block;
-  padding: 0 0.5em;
-  list-style-type: none;
-  vertical-align: top;
+  display: block;
+  line-height: 1.3;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-ul:nth-child(even) {
-  background-color: rgb(74, 187, 187);
+ul:last-of-type {
+  border-radius: 0 0 8px 8px;
+  border-bottom: none;
 }
 
-ul:nth-child(odd) {
-  background-color: rgb(243, 232, 217);
+@media (max-width: 768px) {
+  ul {
+    grid-template-columns: 0.7fr 1.4fr 0.9fr 0.9fr 1.1fr;
+    font-size: 0.85rem;
+  }
+
+  li {
+    padding: 0.4rem 0.2rem;
+    white-space: normal;
+    text-align: center;
+    min-height: 2.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  li:nth-child(2) {
+    padding: 0.4rem 0.15rem;
+    font-size: 0.82rem;
+    line-height: 1.2;
+    word-break: normal;
+    hyphens: none;
+  }
+
+  li:nth-child(5) {
+    font-size: 0.8rem;
+    line-height: 1.15;
+    padding: 0.3rem 0.15rem;
+    min-height: 2.8em;
+  }
+
+  br {
+    display: block;
+    content: '';
+    margin: 3px 0;
+  }
+
+  li:first-child {
+    font-weight: 500;
+  }
 }
 </style>
