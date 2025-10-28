@@ -74,7 +74,6 @@ li {
   padding: 0.6rem 0.4rem;
   list-style: none;
   line-height: 1.3;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

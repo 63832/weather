@@ -3,7 +3,7 @@
   "short_name": "Jesper Weather",
   "icons": [
     {
-      "src": "img/icons/android-chrome-192x192.png",
+      "src": "img/icons/weatherIcon.png",
       "sizes": "192x192",
       "type": "image/png"
     },

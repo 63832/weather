@@ -43,6 +43,13 @@ function getText(code) {
           <li>Gusts: {{ props.weather.wind.windgusts }}{{ props.weather.wind.unit }}</li>
           <li>
             Direction: {{ props.weather.wind.direction }}{{ props.weather.wind.direction_unit }}
+            <!-- Arrow for wind direction -->
+            <div
+              class="wind-arrow"
+              :style="{ transform: `rotate(${props.weather.wind.direction}deg)` }"
+            >
+              ↑
+            </div>
           </li>
         </ul>
       </div>
@@ -51,6 +58,20 @@ function getText(code) {
 </template>
 
 <style scoped>
+.wind-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 1.2rem;
+  color: #222;
+  border-radius: 50%;
+  border: 1px solid #222;
+  transform-origin: center;
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+}
 .weather-card {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;

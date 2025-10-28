@@ -1,8 +1,8 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /~63832/weather
-    RewriteRule ^~63832/weather/index\.html$ - [L]
+    RewriteBase /~s63832/weather
+    RewriteRule ^~s63832/weather/index\.html$ - [L]
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule . /~63832/weather/index.html [L]
+    RewriteRule . /~s63832/weather/index.html [L]
 </IfModule>

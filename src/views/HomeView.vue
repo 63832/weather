@@ -4,52 +4,15 @@ import { getCurrentWeather, getForecast } from '@/services/forecastService'
 import ForecastResult from '@/components/ForecastResult.vue'
 import CurrentWeather from '@/components/currentWeather.vue'
 import { getPosition } from '@/services/positioningService'
+import { countryCodeToFlag } from '@/services/flagService'
+import { reverseGeocode } from '@/services/geolocationService'
+import LocationMap from '@/components/LocationMap.vue'
 
 const location = ref({})
 const info = ref({})
 const currentWeather = ref({})
 const currentLocation = ref({ lat: 0.0, long: 0.0, name: 'Current location' })
 const props = defineProps(['name', 'lat', 'long'])
-
-/**
- * Convert an ISO 3166-1 alpha-2 country code (e.g. "SE") to a flag emoji
- */
-function countryCodeToFlag(code) {
-  if (!code) return ''
-  const cc = String(code).toUpperCase()
-  if (cc.length !== 2) return ''
-  return cc
-    .split('')
-    .map((char) => String.fromCodePoint(127397 + char.charCodeAt(0)))
-    .join('')
-}
-
-/**
- * Reverse-geocode coordinates (lat, lon) into a country name + ISO code using Nominatim
- */
-async function reverseGeocode(lat, lon) {
-  try {
-    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(
-      lat,
-    )}&lon=${encodeURIComponent(lon)}&zoom=10&accept-language=en`
-    const res = await fetch(url, { headers: { 'Content-Type': 'application/json' } })
-    if (!res.ok) return null
-    const data = await res.json()
-    const countryCode = data?.address?.country_code ? data.address.country_code.toUpperCase() : null
-    const country = data?.address?.country ?? null
-    const placeName =
-      data?.address?.city ||
-      data?.address?.town ||
-      data?.address?.village ||
-      data?.address?.municipality ||
-      data?.address?.county ||
-      (data?.display_name ? String(data.display_name).split(',')[0] : null)
-    return { countryCode, country, placeName }
-  } catch (err) {
-    console.warn('reverseGeocode failed', err)
-    return null
-  }
-}
 
 /**
  * Ensure that location objects always have a valid ISO alpha-2 code
@@ -167,18 +130,7 @@ watch(currentLocation, () => {
         </span>
       </h2>
 
-      <div
-        class="country-map"
-        v-if="typeof location.lat !== 'undefined' && typeof location.long !== 'undefined'"
-      >
-        <iframe
-          :src="`https://maps.google.com/maps?q=${location.lat},${location.long}&z=6&output=embed`"
-          frameborder="0"
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          title="Location map"
-        ></iframe>
-      </div>
+      <LocationMap v-if="location.lat && location.long" :lat="location.lat" :long="location.long" />
 
       <div class="coordinates">
         <p class="location">
