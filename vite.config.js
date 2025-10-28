@@ -6,7 +6,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
-    base: '/~63832/weather',
+    base: '/~s63832/weather',
     plugins: [
         vue(),
         vueDevTools(),
