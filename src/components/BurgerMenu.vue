@@ -6,6 +6,11 @@ function toggleActive() {
   // emit the *next* state (toggle)
   emits('toggle-menu', !props.active)
 }
+
+function closeMenu() {
+  // explicitly close the menu
+  emits('toggle-menu', false)
+}
 </script>
 
 <template>
@@ -16,8 +21,8 @@ function toggleActive() {
       <span class="burger-bar bar--3"></span>
     </button>
     <nav class="navbar" v-if="props.active" @click.stop>
-      <RouterLink to="/">Home</RouterLink>
-      <RouterLink to="/locations">Locations</RouterLink>
+      <RouterLink to="/" @click="closeMenu">Home</RouterLink>
+      <RouterLink to="/locations" @click="closeMenu">Locations</RouterLink>
     </nav>
   </div>
 </template>
@@ -44,7 +49,6 @@ function toggleActive() {
   z-index: 1001;
 }
 
-/* Streck */
 .burger-bar {
   position: absolute;
   left: 8px;
@@ -58,7 +62,6 @@ function toggleActive() {
     background-color 0.3s ease;
 }
 
-/* Startläge */
 .bar--1 {
   transform: translateY(-7px);
 }
@@ -69,7 +72,6 @@ function toggleActive() {
   transform: translateY(7px);
 }
 
-/* === ACTIVE (X) === */
 #burger.active .bar--1 {
   transform: translateY(0) rotate(45deg);
 }
@@ -83,15 +85,13 @@ function toggleActive() {
   transform: translateY(0) rotate(-45deg);
 }
 
-/* Liten modern hover-effekt (fungerar i båda lägen) */
 #burger .burger-button:hover .burger-bar {
   background-color: #000;
 }
 
-/* Overlay navbar that doesn't affect page layout */
 .navbar {
   position: fixed;
-  top: 3.6rem; /* below the burger button */
+  top: 3.6rem;
   left: 1rem;
   background: #fff;
   padding: 0.5rem 0.75rem;

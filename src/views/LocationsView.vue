@@ -64,7 +64,7 @@ function reset() {
   <button @click="save">Save</button>
   <button @click="reset">Reset</button>
   <hr />
-  <h3>List</h3>
+  <h3>List:</h3>
   <ul>
     <li
       v-for="loc in locationsList"
@@ -76,16 +76,20 @@ function reset() {
       ({{ Math.abs(loc.position.lat).toFixed(2) }}°{{ loc.position.lat > 0 ? 'N' : 'S' }}
       {{ Math.abs(loc.position.long).toFixed(2) }}°{{ loc.position.long > 0 ? 'E' : 'W' }})
       <span class="edit" @click.stop="editValue(loc)" title="Edit location">✒️</span>
-      <span class="remove" @click="remove(loc)" title="Remove location">x</span>
+      <span class="remove" @click="remove(loc)" title="Remove location">X</span>
     </li>
   </ul>
 </template>
 
 <style scoped>
+h2 {
+  margin-top: calc(0.5rem + 30px);
+}
+
 label {
   display: block;
   width: 15em;
-  padding-top: 0.5em;
+  padding-top: 1.5em;
 }
 
 .remove {
@@ -114,13 +118,23 @@ ul {
   padding: 0;
 }
 
-span.edit {
-  position: absolute;
-  right: 20%;
-  display: inline-block;
+span.edit,
+.remove {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
+  font-size: 1.2em;
 }
 
+span.edit {
+  margin-right: 0;
+}
+
+.remove {
+  color: red;
+  font-weight: bold;
+}
 .default {
   font-weight: bold;
 }

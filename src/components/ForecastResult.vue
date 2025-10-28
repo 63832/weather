@@ -31,8 +31,14 @@ function getText(code) {
       }}%)
     </li>
     <li>
-      {{ day.wind.speed }}({{ day.wind.gusts }}){{ day.wind.unit }}<br />{{ day.wind.direction
-      }}{{ day.wind.direction_unit }}
+      <div>{{ day.wind.speed }} ({{ day.wind.gusts }}){{ day.wind.unit }}</div>
+      <div
+        class="wind-arrow"
+        :style="{ transform: `rotate(${day.wind.direction}deg)` }"
+        title="Wind direction"
+      >
+        ↑
+      </div>
     </li>
   </ul>
 </template>
@@ -49,25 +55,24 @@ ul {
   transition: background 0.2s ease;
 }
 
-ul:first-of-type {
+ul.header {
   background: #264653;
-  color: #ffffff;
+  color: #fff;
   font-weight: 600;
   border-radius: 8px 8px 0 0;
 }
 
-ul:not(:first-of-type):nth-child(even) {
+ul:not(.header):nth-child(even) {
   background-color: #f7f4ef;
 }
 
-ul:not(:first-of-type):nth-child(odd) {
+ul:not(.header):nth-child(odd) {
   background-color: #d8f0f0;
 }
 
 li {
   padding: 0.6rem 0.4rem;
-  list-style-type: none;
-  display: block;
+  list-style: none;
   line-height: 1.3;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   overflow: hidden;
@@ -78,6 +83,27 @@ li {
 ul:last-of-type {
   border-radius: 0 0 8px 8px;
   border-bottom: none;
+}
+
+.wind-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.wind-arrow {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transform-origin: center center;
+  transition: transform 0.3s ease;
+  margin-bottom: 4px;
 }
 
 @media (max-width: 768px) {
@@ -94,31 +120,22 @@ ul:last-of-type {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column; /* stack content vertically */
   }
 
   li:nth-child(2) {
-    padding: 0.4rem 0.15rem;
     font-size: 0.82rem;
     line-height: 1.2;
-    word-break: normal;
-    hyphens: none;
   }
 
   li:nth-child(5) {
     font-size: 0.8rem;
     line-height: 1.15;
-    padding: 0.3rem 0.15rem;
-    min-height: 2.8em;
   }
 
   br {
     display: block;
-    content: '';
     margin: 3px 0;
-  }
-
-  li:first-child {
-    font-weight: 500;
   }
 }
 </style>

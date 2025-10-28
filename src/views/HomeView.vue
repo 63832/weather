@@ -11,7 +11,9 @@ const currentWeather = ref({})
 const currentLocation = ref({ lat: 0.0, long: 0.0, name: 'Current location' })
 const props = defineProps(['name', 'lat', 'long'])
 
-// Convert ISO 3166-1 alpha-2 country code (e.g. 'SE') to regional indicator symbol emoji
+/**
+ * Convert an ISO 3166-1 alpha-2 country code (e.g. "SE") to a flag emoji
+ */
 function countryCodeToFlag(code) {
   if (!code) return ''
   const cc = String(code).toUpperCase()
@@ -22,23 +24,19 @@ function countryCodeToFlag(code) {
     .join('')
 }
 
-// Reverse-geocode coordinates to get country code and a readable place name (uses Nominatim)
+/**
+ * Reverse-geocode coordinates (lat, lon) into a country name + ISO code using Nominatim
+ */
 async function reverseGeocode(lat, lon) {
   try {
     const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(
       lat,
     )}&lon=${encodeURIComponent(lon)}&zoom=10&accept-language=en`
-    const res = await fetch(url, {
-      headers: {
-        // Nominatim discourages heavy use; keep request headers minimal
-        'Content-Type': 'application/json',
-      },
-    })
+    const res = await fetch(url, { headers: { 'Content-Type': 'application/json' } })
     if (!res.ok) return null
     const data = await res.json()
     const countryCode = data?.address?.country_code ? data.address.country_code.toUpperCase() : null
     const country = data?.address?.country ?? null
-    // Best-effort place name: city, town, village, municipality, county or fallback to first part of display_name
     const placeName =
       data?.address?.city ||
       data?.address?.town ||
@@ -48,37 +46,43 @@ async function reverseGeocode(lat, lon) {
       (data?.display_name ? String(data.display_name).split(',')[0] : null)
     return { countryCode, country, placeName }
   } catch (err) {
-    // Don't block the UI on reverse-geocode errors
     console.warn('reverseGeocode failed', err)
     return null
+  }
+}
+
+/**
+ * Ensure that location objects always have a valid ISO alpha-2 code
+ */
+function ensureCountryCode(loc) {
+  if (!loc) return
+  if (!loc.countryCode && loc.country) {
+    // Nominatim usually provides countryCode, so we just pass it through if present
+    loc.countryCode = loc.countryCode || loc.countryCode
   }
 }
 
 onMounted(() => {
   getPosition()
     .then(async (pos) => {
-      // initially set a placeholder name; we'll replace it if reverse-geocode returns something
       currentLocation.value = { name: 'Current location', ...pos.position }
-      // populate country / countryCode / placeName asynchronously
+
       const r = await reverseGeocode(pos.position.lat, pos.position.long)
       if (r?.countryCode) currentLocation.value.countryCode = r.countryCode
       if (r?.country) currentLocation.value.country = r.country
-      if (r?.placeName) {
-        // update displayed name
-        currentLocation.value.name = r.placeName
-        // if the page currently uses the current location (no explicit props.name) update location and fetch
-        if (!props.name || props.name === '') {
-          // if location currently equals the previous currentLocation coordinates, update it
-          if (
-            typeof location.value.lat === 'undefined' ||
-            (location.value.lat === pos.position.lat &&
-              location.value.long === pos.position.long) ||
-            location.value.name === 'Current location'
-          ) {
-            location.value = { ...currentLocation.value }
-            // fetch forecast for the new name/location
-            fetchForeCast(location.value)
-          }
+      if (r?.placeName) currentLocation.value.name = r.placeName
+
+      // Always ensure countryCode
+      ensureCountryCode(currentLocation.value)
+
+      if (!props.name || props.name === '') {
+        if (
+          typeof location.value.lat === 'undefined' ||
+          (location.value.lat === pos.position.lat && location.value.long === pos.position.long) ||
+          location.value.name === 'Current location'
+        ) {
+          location.value = { ...currentLocation.value }
+          fetchForeCast(location.value)
         }
       }
     })
@@ -90,36 +94,37 @@ function fetchForeCast(loc) {
     .then((response) => {
       info.value = response
     })
-    .catch((err) => {
-      console.log(err)
-    })
-  // Hämta aktuellt väder
+    .catch((err) => console.log(err))
+
   getCurrentWeather(loc)
     .then((response) => {
       currentWeather.value = response
     })
-    .catch((err) => {
-      console.log(err)
-    })
+    .catch((err) => console.log(err))
 }
 
+// Watch props / localStorage locations
 watchEffect(() => {
-  // Läs in alla sparade locations
   let locationsList = JSON.parse(localStorage.getItem('locations')) ?? []
   let tmpLocation = {}
+
   if (typeof props.name !== 'undefined') {
-    // sök location
-    tmpLocation = locationsList.find((loc) => {
-      return loc.name.toLowerCase() === props.name.toLowerCase()
-    })
+    tmpLocation = locationsList.find((loc) => loc.name.toLowerCase() === props.name.toLowerCase())
+
     if (tmpLocation) {
-      // Tilldela hittad location
       location.value.name = tmpLocation.name
       location.value.lat = tmpLocation.position.lat
       location.value.long = tmpLocation.position.long
+      location.value.country = tmpLocation.country
+      location.value.countryCode = tmpLocation.countryCode
+
+      // Always get country code from lat/long for saved locations
+      reverseGeocode(location.value.lat, location.value.long).then((r) => {
+        if (r?.countryCode) location.value.countryCode = r.countryCode
+        if (r?.country) location.value.country = r.country
+      })
     }
   } else {
-    // Tilldela default-position
     location.value = currentLocation.value
   }
 
@@ -127,14 +132,19 @@ watchEffect(() => {
     location.value.name = props.name
     location.value.lat = parseFloat(props.lat)
     location.value.long = parseFloat(props.long)
+
+    // Ensure flag works
+    ensureCountryCode(location.value)
   }
+
   if (typeof location.value.name !== 'undefined') {
     fetchForeCast(location.value)
   }
 })
 
+// Refetch when currentLocation changes
 watch(currentLocation, () => {
-  if (location.value.name == currentLocation.value.name) {
+  if (location.value.name === currentLocation.value.name) {
     fetchForeCast(currentLocation.value)
   }
 })
@@ -147,13 +157,14 @@ watch(currentLocation, () => {
       <i>{{ props.name }}</i> finns inte i listan över platser
     </p>
   </main>
+
   <main v-else>
     <div class="location-header">
       <h2>
         {{ location.name }}
-        <span class="flag" v-if="location.countryCode">{{
-          countryCodeToFlag(location.countryCode)
-        }}</span>
+        <span class="flag" v-if="location.countryCode">
+          {{ countryCodeToFlag(location.countryCode) }}
+        </span>
       </h2>
 
       <div
@@ -178,6 +189,7 @@ watch(currentLocation, () => {
         </p>
       </div>
     </div>
+
     <div class="weather-container">
       <CurrentWeather v-if="currentWeather?.code" :weather="currentWeather" />
       <ForecastResult :forecast="info" />
@@ -241,7 +253,49 @@ watch(currentLocation, () => {
   border: 0;
   border-radius: 6px;
 }
+.weather-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
+/* Wrap wind info / other details nicely on small screens */
+.weather-container > * {
+  flex-wrap: wrap;
+}
+
+.location {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0.5rem;
+  padding: 0.5rem 0.8rem; /* slightly more padding */
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+/* Mobile tweaks */
+@media (max-width: 600px) {
+  .weather-container {
+    gap: 1.2rem; /* more vertical spacing */
+  }
+
+  .location {
+    flex-direction: column; /* stack label + value vertically */
+    align-items: flex-start;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.95rem;
+  }
+
+  .location span {
+    margin-left: 0; /* remove left margin when stacked */
+    margin-top: 0.2rem;
+  }
+
+  .country-map iframe {
+    width: 100%;
+    height: 180px;
+  }
+}
 @media (max-width: 600px) {
   .country-map iframe {
     width: 100%;
