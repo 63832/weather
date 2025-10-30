@@ -15,15 +15,30 @@ onMounted(() => {
 })
 
 function save() {
-  locationsList.value.push(location.value)
+  const existingIndex = locationsList.value.findIndex(
+    (itm) =>
+      itm.name.trim().toLowerCase() === location.value.name.trim().toLowerCase() ||
+      (itm.position.lat === location.value.position.lat &&
+        itm.position.long === location.value.position.long),
+  )
+
+  if (existingIndex !== -1) {
+    const wasDefault = locationsList.value[existingIndex].default
+    locationsList.value[existingIndex] = { ...location.value, default: wasDefault }
+  } else {
+    locationsList.value.push({ ...location.value })
+  }
+
   location.value = { name: '', position: { lat: 0, long: 0 }, default: false }
   localStorage.setItem('locations', JSON.stringify(locationsList.value))
 }
 
 function remove(location) {
-  locationsList.value = locationsList.value.filter((itm) => {
-    return itm.position.lat != location.position.lat && itm.position.long != location.position.long
-  })
+  locationsList.value = locationsList.value.filter(
+    (itm) =>
+      itm.position.lat !== location.position.lat || itm.position.long !== location.position.long,
+  )
+
   localStorage.setItem('locations', JSON.stringify(locationsList.value))
 }
 
@@ -41,8 +56,9 @@ function setDefault(e) {
 }
 
 function editValue(itm) {
-  location.value = itm
+  location.value = { ...itm, position: { ...itm.position } }
 }
+
 function reset() {
   location.value = { name: '', position: { lat: 0, long: 0 }, default: false }
 }
