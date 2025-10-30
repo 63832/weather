@@ -42,8 +42,7 @@ function getText(code) {
           <li>Speed: {{ props.weather.wind.windspeed }}{{ props.weather.wind.unit }}</li>
           <li>Gusts: {{ props.weather.wind.windgusts }}{{ props.weather.wind.unit }}</li>
           <li>
-            Direction: {{ props.weather.wind.direction }}{{ props.weather.wind.direction_unit }}
-            <!-- Arrow for wind direction -->
+            Direction:
             <div
               class="wind-arrow"
               :style="{ transform: `rotate(${props.weather.wind.direction}deg)` }"

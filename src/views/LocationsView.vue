@@ -17,9 +17,8 @@ onMounted(() => {
 function save() {
   const existingIndex = locationsList.value.findIndex(
     (itm) =>
-      itm.name.trim().toLowerCase() === location.value.name.trim().toLowerCase() ||
-      (itm.position.lat === location.value.position.lat &&
-        itm.position.long === location.value.position.long),
+      itm.position.lat === location.value.position.lat &&
+      itm.position.long === location.value.position.long,
   )
 
   if (existingIndex !== -1) {
